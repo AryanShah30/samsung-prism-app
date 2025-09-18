@@ -1,10 +1,12 @@
+import { EXPIRY_THRESHOLDS } from './config';
+
 export function calculateStatus(expiryDate) {
   const today = new Date();
   const expiry = new Date(expiryDate);
   const diffDays = (expiry - today) / (1000 * 60 * 60 * 24);
 
   if (diffDays < 0) return "Expired";
-  if (diffDays <= 3) return "Expiring Soon";
+  if (diffDays <= EXPIRY_THRESHOLDS.EXPIRING_SOON_DAYS) return "Expiring Soon";
   return "Fresh";
 }
 

@@ -8,8 +8,12 @@ export default async function handler(req, res) {
   try {
     const { categoryId, moveToCategoryId } = req.body;
     
-    if (!categoryId || !Number.isInteger(Number(categoryId))) {
+    if (!categoryId || !Number.isInteger(Number(categoryId)) || Number(categoryId) <= 0) {
       return res.status(400).json({ error: "Valid category ID is required" });
+    }
+
+    if (moveToCategoryId && (!Number.isInteger(Number(moveToCategoryId)) || Number(moveToCategoryId) <= 0)) {
+      return res.status(400).json({ error: "Valid move-to category ID is required" });
     }
 
     const category = await prisma.category.findUnique({

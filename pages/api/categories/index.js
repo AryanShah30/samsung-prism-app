@@ -1,4 +1,5 @@
 import { prisma } from "../../../lib/prisma";
+import { validateCategory } from "../../../utils/validation";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -15,8 +16,12 @@ export default async function handler(req, res) {
     try {
       const { name } = req.body;
       
-      if (!name || typeof name !== 'string' || name.trim().length === 0) {
-        return res.status(400).json({ error: "Category name is required" });
+      const validation = validateCategory({ name });
+      if (!validation.isValid) {
+        return res.status(400).json({ 
+          error: "Validation failed", 
+          details: validation.errors 
+        });
       }
 
       const newCategory = await prisma.category.create({

@@ -1,14 +1,23 @@
 import { prisma } from "../../../lib/prisma";
+import { validateCategory } from "../../../utils/validation";
 
 export default async function handler(req, res) {
   const { id } = req.query;
+
+  if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+    return res.status(400).json({ error: "Valid category ID is required" });
+  }
 
   if (req.method === "PUT") {
     try {
       const { name } = req.body;
       
-      if (!name || typeof name !== 'string' || name.trim().length === 0) {
-        return res.status(400).json({ error: "Category name is required" });
+      const validation = validateCategory({ name });
+      if (!validation.isValid) {
+        return res.status(400).json({ 
+          error: "Validation failed", 
+          details: validation.errors 
+        });
       }
 
       const updatedCategory = await prisma.category.update({

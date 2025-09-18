@@ -1,4 +1,5 @@
 import { prisma } from "../../../lib/prisma";
+import { EXPIRY_THRESHOLDS } from "../../../utils/config";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -6,11 +7,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { days = 7 } = req.query;
+    const { days = EXPIRY_THRESHOLDS.SOON_DAYS } = req.query;
     const daysThreshold = parseInt(days);
 
-    if (isNaN(daysThreshold) || daysThreshold < 0) {
-      return res.status(400).json({ error: "Invalid days parameter" });
+    if (isNaN(daysThreshold) || daysThreshold < 0 || daysThreshold > 365) {
+      return res.status(400).json({ error: "Invalid days parameter. Must be between 0 and 365" });
     }
 
     const expiringItems = await prisma.foodItem.findMany({
@@ -28,8 +29,8 @@ export default async function handler(req, res) {
       totalItems,
       expiringItems: expiringItems.length,
       expiredItems: expiringItems.filter(item => item.daysUntilExpiry < 0).length,
-      urgentItems: expiringItems.filter(item => item.daysUntilExpiry <= 3).length,
-      soonItems: expiringItems.filter(item => item.daysUntilExpiry > 3 && item.daysUntilExpiry <= 7).length
+      urgentItems: expiringItems.filter(item => item.daysUntilExpiry <= EXPIRY_THRESHOLDS.URGENT_DAYS).length,
+      soonItems: expiringItems.filter(item => item.daysUntilExpiry > EXPIRY_THRESHOLDS.URGENT_DAYS && item.daysUntilExpiry <= EXPIRY_THRESHOLDS.SOON_DAYS).length
     };
 
     res.status(200).json({

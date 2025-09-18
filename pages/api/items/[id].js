@@ -1,19 +1,32 @@
 import { prisma } from "../../../lib/prisma";
 import { calculateStatusAndDays } from "../../../utils/status";
+import { validateFoodItem } from "../../../utils/validation";
 
 export default async function handler(req, res) {
   const { id } = req.query;
 
+  if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+    return res.status(400).json({ error: "Valid item ID is required" });
+  }
+
   if (req.method === "PUT") {
     try {
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
+      
+      const validation = validateFoodItem({ name, quantity, unit, expiryDate, notes, categoryId });
+      if (!validation.isValid) {
+        return res.status(400).json({ 
+          error: "Validation failed", 
+          details: validation.errors 
+        });
+      }
 
       let updateData = {
-        ...(name && { name }),
+        ...(name && { name: name.trim() }),
         ...(quantity && { quantity }),
-        ...(unit && { unit }),
+        ...(unit && { unit: unit.trim() }),
         ...(expiryDate && { expiryDate: new Date(expiryDate) }),
-        ...(notes !== undefined && { notes }),
+        ...(notes !== undefined && { notes: notes ? notes.trim() : notes }),
         ...(categoryId && { categoryId }),
       };
 

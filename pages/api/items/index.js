@@ -28,7 +28,16 @@ export default async function handler(req, res) {
 
       const { status, daysUntilExpiry } = calculateStatusAndDays(expiryDate);
       const newFood = await prisma.foodItem.create({
-        data: { name, quantity, unit, expiryDate: new Date(expiryDate), notes, categoryId, status, daysUntilExpiry },
+        data: { 
+          name: name.trim(), 
+          quantity, 
+          unit: unit.trim(), 
+          expiryDate: new Date(expiryDate), 
+          notes: notes ? notes.trim() : notes, 
+          categoryId, 
+          status, 
+          daysUntilExpiry 
+        },
       });
 
       res.status(201).json(newFood);

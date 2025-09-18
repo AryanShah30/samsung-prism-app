@@ -1,4 +1,5 @@
 import { prisma } from "../../../lib/prisma";
+import { EXPIRY_THRESHOLDS } from "../../../utils/config";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -19,8 +20,8 @@ export default async function handler(req, res) {
     });
 
     const expired = foodItems.filter(item => item.daysUntilExpiry < 0);
-    const expiringSoon = foodItems.filter(item => item.daysUntilExpiry >= 0 && item.daysUntilExpiry <= 7);
-    const fresh = foodItems.filter(item => item.daysUntilExpiry > 7);
+    const expiringSoon = foodItems.filter(item => item.daysUntilExpiry >= 0 && item.daysUntilExpiry <= EXPIRY_THRESHOLDS.SOON_DAYS);
+    const fresh = foodItems.filter(item => item.daysUntilExpiry > EXPIRY_THRESHOLDS.SOON_DAYS);
 
     const recentlyExpired = expired
       .sort((a, b) => Math.abs(a.daysUntilExpiry) - Math.abs(b.daysUntilExpiry))

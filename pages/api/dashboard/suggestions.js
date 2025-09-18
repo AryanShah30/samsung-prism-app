@@ -1,5 +1,6 @@
 import { prisma } from "../../../lib/prisma";
 import { getDaysUntilExpiry } from "../../../utils/status";
+import { EXPIRY_THRESHOLDS } from "../../../utils/config";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -17,8 +18,8 @@ export default async function handler(req, res) {
     }));
 
     const expired = itemsWithDays.filter(item => item.daysUntilExpiry < 0);
-    const expiringSoon = itemsWithDays.filter(item => item.daysUntilExpiry >= 0 && item.daysUntilExpiry <= 7);
-    const fresh = itemsWithDays.filter(item => item.daysUntilExpiry > 7);
+    const expiringSoon = itemsWithDays.filter(item => item.daysUntilExpiry >= 0 && item.daysUntilExpiry <= EXPIRY_THRESHOLDS.SOON_DAYS);
+    const fresh = itemsWithDays.filter(item => item.daysUntilExpiry > EXPIRY_THRESHOLDS.SOON_DAYS);
 
     const suggestions = [];
 
@@ -31,11 +32,11 @@ export default async function handler(req, res) {
     }
 
     if (expiringSoon.length > 0) {
-      const urgentItems = expiringSoon.filter(item => item.daysUntilExpiry <= 3);
+      const urgentItems = expiringSoon.filter(item => item.daysUntilExpiry <= EXPIRY_THRESHOLDS.URGENT_DAYS);
       if (urgentItems.length > 0) {
         suggestions.push({
           type: "warning",
-          message: `${urgentItems.length} item(s) expiring in 3 days or less. Plan meals around these items.`,
+          message: `${urgentItems.length} item(s) expiring in ${EXPIRY_THRESHOLDS.URGENT_DAYS} days or less. Plan meals around these items.`,
           action: "View expiring items",
           items: urgentItems.map(item => item.name)
         });

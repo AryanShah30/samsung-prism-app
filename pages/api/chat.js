@@ -1,6 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import fetch from "node-fetch";
 import { validateChatMessage } from "../../utils/validation";
+import { EXPIRY_THRESHOLDS } from "../../utils/config";
 
 function analyzeInventory(foodItems) {
   const expiringSoon = [];
@@ -13,12 +14,12 @@ function analyzeInventory(foodItems) {
         ...item,
         urgency: 'expired'
       });
-    } else if (item.daysUntilExpiry <= 3) {
+    } else if (item.daysUntilExpiry <= EXPIRY_THRESHOLDS.URGENT_DAYS) {
       expiringSoon.push({
         ...item,
         urgency: 'urgent'
       });
-    } else if (item.daysUntilExpiry <= 7) {
+    } else if (item.daysUntilExpiry <= EXPIRY_THRESHOLDS.SOON_DAYS) {
       expiringSoon.push({
         ...item,
         urgency: 'soon'
