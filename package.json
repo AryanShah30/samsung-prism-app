@@ -1,0 +1,25 @@
+{
+  "name": "inventoryapp",
+  "version": "1.0.0",
+  "description": "A simple app to help users:",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prisma": "^6.16.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "next": "^15.5.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
