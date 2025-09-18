@@ -1,13 +1,10 @@
-import { PrismaClient } from "@prisma/client";
-import { calculateStatus } from "../../../utils/status";
-
-// Prisma client for DB access
-const prisma = new PrismaClient();
+import { prisma } from "../../../lib/prisma";
+import { calculateStatusAndDays } from "../../../utils/status";
+import { validateFoodItem } from "../../../utils/validation";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
-      // Fetch all food items including their category
       const foodItems = await prisma.foodItem.findMany({
         include: { category: true },
       });
@@ -21,17 +18,17 @@ export default async function handler(req, res) {
   } else if (req.method === "POST") {
     try {
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
-
-      // Validate required fields
-      if (!name || !quantity || !unit || !expiryDate || !categoryId) {
-        return res.status(400).json({ error: "Missing required fields" });
+      const validation = validateFoodItem({ name, quantity, unit, expiryDate, categoryId });
+      if (!validation.isValid) {
+        return res.status(400).json({ 
+          error: "Validation failed", 
+          details: validation.errors 
+        });
       }
 
-      const status = calculateStatus(expiryDate);
-
-      // Insert new item
+      const { status, daysUntilExpiry } = calculateStatusAndDays(expiryDate);
       const newFood = await prisma.foodItem.create({
-        data: { name, quantity, unit, expiryDate: new Date(expiryDate), notes, categoryId, status },
+        data: { name, quantity, unit, expiryDate: new Date(expiryDate), notes, categoryId, status, daysUntilExpiry },
       });
 
       res.status(201).json(newFood);

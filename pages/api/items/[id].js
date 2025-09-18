@@ -1,28 +1,26 @@
-import { PrismaClient } from "@prisma/client";
-import { calculateStatus } from "../../../utils/status";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../lib/prisma";
+import { calculateStatusAndDays } from "../../../utils/status";
 
 export default async function handler(req, res) {
-  const { id } = req.query; // Food item ID from URL
+  const { id } = req.query;
 
   if (req.method === "PUT") {
     try {
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
 
-      // Recalculate status only if expiryDate is provided
-      const status = expiryDate ? calculateStatus(expiryDate) : undefined;
-
-      // Only update fields provided in request
-      const updateData = {
+      let updateData = {
         ...(name && { name }),
         ...(quantity && { quantity }),
         ...(unit && { unit }),
         ...(expiryDate && { expiryDate: new Date(expiryDate) }),
         ...(notes !== undefined && { notes }),
         ...(categoryId && { categoryId }),
-        ...(status && { status }),
       };
+
+      if (expiryDate) {
+        const { status, daysUntilExpiry } = calculateStatusAndDays(expiryDate);
+        updateData = { ...updateData, status, daysUntilExpiry };
+      }
 
       const updatedFood = await prisma.foodItem.update({
         where: { id: parseInt(id) },
@@ -37,7 +35,6 @@ export default async function handler(req, res) {
 
   } else if (req.method === "DELETE") {
     try {
-      // Remove item by ID
       const deletedFood = await prisma.foodItem.delete({
         where: { id: parseInt(id) },
       });

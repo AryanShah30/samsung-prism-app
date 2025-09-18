@@ -24,16 +24,22 @@ model Category {
 // Stores individual food inventory entries
 // =============================
 model FoodItem {
-  id          Int      @id @default(autoincrement()) // Primary key
-  name        String                                 // Item name (e.g., Milk)
-  quantity    Float                                  // Amount of the item
-  unit        String                                 // Unit of measurement (e.g., Liter, Kg)
-  dateAdded   DateTime @default(now())               // Timestamp when added
-  expiryDate  DateTime                               // Expiration date
-  status      String                                 // Fresh, Expiring Soon, or Expired
-  notes       String?                                // Optional notes (e.g., Organic)
+  id              Int      @id @default(autoincrement()) // Primary key
+  name            String                                 // Item name (e.g., Milk)
+  quantity        Float                                  // Amount of the item
+  unit            String                                 // Unit of measurement (e.g., Liter, Kg)
+  dateAdded       DateTime @default(now())               // Timestamp when added
+  expiryDate      DateTime                               // Expiration date
+  daysUntilExpiry Int                                    // Calculated days until expiry (can be negative)
+  status          String                                 // Fresh, Expiring Soon, or Expired
+  notes           String?                                // Optional notes (e.g., Organic)
 
   // Foreign key: links each food item to a category
-  categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  category        Category @relation(fields: [categoryId], references: [id])
+
+  // Indexes for better performance
+  @@index([daysUntilExpiry])
+  @@index([status])
+  @@index([expiryDate])
 }
