@@ -1,45 +1,32 @@
-// Generates Prisma Client for JS, used to interact with the database
 generator client {
   provider = "prisma-client-js"
 }
 
-// Database connection settings (PostgreSQL URL comes from .env)
 datasource db {
   provider = "postgresql" 
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") 
 }
 
-// =============================
-// Table: Category
-// Stores food categories (e.g., Dairy, Vegetables)
-// =============================
 model Category {
-  id      Int        @id @default(autoincrement()) // Primary key
-  name    String     @unique                       // Category name, must be unique
-  items   FoodItem[]                               // One category → many food items
-}
+  id      Int        @id @default(autoincrement()) 
+  name    String     @unique 
+  items   FoodItem[] 
 
-// =============================
-// Table: FoodItem
-// Stores individual food inventory entries
-// =============================
 model FoodItem {
-  id              Int      @id @default(autoincrement()) // Primary key
-  name            String                                 // Item name (e.g., Milk)
-  quantity        Float                                  // Amount of the item
-  unit            String                                 // Unit of measurement (e.g., Liter, Kg)
-  dateAdded       DateTime @default(now())               // Timestamp when added
-  expiryDate      DateTime                               // Expiration date
-  daysUntilExpiry Int                                    // Calculated days until expiry (can be negative)
-  status          String                                 // Fresh, Expiring Soon, or Expired
-  notes           String?                                // Optional notes (e.g., Organic)
-
-  // Foreign key: links each food item to a category
+  id              Int      @id @default(autoincrement())
+  name            String 
+  quantity        Float 
+  unit            String 
+  
+  dateAdded       DateTime @default(now()) 
+  expiryDate      DateTime
+  daysUntilExpiry Int 
+  status          String 
+  notes           String? 
+  
   categoryId      Int
-  category        Category @relation(fields: [categoryId], references: [id])
-
-  // Indexes for better performance
-  @@index([daysUntilExpiry])
+  category        Category @relation(fields: [categoryId], references: [id]) 
+  
+  @@index([daysUntilExpiry]) 
   @@index([status])
   @@index([expiryDate])
-}

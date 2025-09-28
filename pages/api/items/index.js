@@ -14,29 +14,36 @@ export default async function handler(req, res) {
       console.error(error);
       res.status(500).json({ error: "Failed to fetch food items" });
     }
-
   } else if (req.method === "POST") {
     try {
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
-      const validation = validateFoodItem({ name, quantity, unit, expiryDate, categoryId });
+
+      const validation = validateFoodItem({
+        name,
+        quantity,
+        unit,
+        expiryDate,
+        categoryId,
+      });
       if (!validation.isValid) {
-        return res.status(400).json({ 
-          error: "Validation failed", 
-          details: validation.errors 
+        return res.status(400).json({
+          error: "Validation failed",
+          details: validation.errors,
         });
       }
 
       const { status, daysUntilExpiry } = calculateStatusAndDays(expiryDate);
+
       const newFood = await prisma.foodItem.create({
-        data: { 
-          name: name.trim(), 
-          quantity, 
-          unit: unit.trim(), 
-          expiryDate: new Date(expiryDate), 
-          notes: notes ? notes.trim() : notes, 
-          categoryId, 
-          status, 
-          daysUntilExpiry 
+        data: {
+          name: name.trim(),
+          quantity,
+          unit: unit.trim(),
+          expiryDate: new Date(expiryDate),
+          notes: notes ? notes.trim() : notes,
+          categoryId,
+          status,
+          daysUntilExpiry,
         },
       });
 
@@ -45,7 +52,6 @@ export default async function handler(req, res) {
       console.error(error);
       res.status(500).json({ error: "Failed to create food item" });
     }
-
   } else {
     res.status(405).json({ error: "Method not allowed" });
   }

@@ -12,12 +12,19 @@ export default async function handler(req, res) {
   if (req.method === "PUT") {
     try {
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
-      
-      const validation = validateFoodItem({ name, quantity, unit, expiryDate, notes, categoryId });
+
+      const validation = validateFoodItem({
+        name,
+        quantity,
+        unit,
+        expiryDate,
+        notes,
+        categoryId,
+      });
       if (!validation.isValid) {
-        return res.status(400).json({ 
-          error: "Validation failed", 
-          details: validation.errors 
+        return res.status(400).json({
+          error: "Validation failed",
+          details: validation.errors,
         });
       }
 
@@ -45,19 +52,19 @@ export default async function handler(req, res) {
       console.error(error);
       res.status(500).json({ error: "Failed to update food item" });
     }
-
   } else if (req.method === "DELETE") {
     try {
       const deletedFood = await prisma.foodItem.delete({
         where: { id: parseInt(id) },
       });
 
-      res.status(200).json({ message: "Food item deleted successfully", item: deletedFood });
+      res
+        .status(200)
+        .json({ message: "Food item deleted successfully", item: deletedFood });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to delete food item" });
     }
-
   } else {
     res.status(405).json({ error: "Method not allowed" });
   }

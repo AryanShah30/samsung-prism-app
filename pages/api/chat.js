@@ -8,26 +8,26 @@ function analyzeInventory(foodItems) {
   const expired = [];
   const fresh = [];
 
-  foodItems.forEach(item => {
+  foodItems.forEach((item) => {
     if (item.daysUntilExpiry < 0) {
       expired.push({
         ...item,
-        urgency: 'expired'
+        urgency: "expired",
       });
     } else if (item.daysUntilExpiry <= EXPIRY_THRESHOLDS.URGENT_DAYS) {
       expiringSoon.push({
         ...item,
-        urgency: 'urgent'
+        urgency: "urgent",
       });
     } else if (item.daysUntilExpiry <= EXPIRY_THRESHOLDS.SOON_DAYS) {
       expiringSoon.push({
         ...item,
-        urgency: 'soon'
+        urgency: "soon",
       });
     } else {
       fresh.push({
         ...item,
-        urgency: 'fresh'
+        urgency: "fresh",
       });
     }
   });
@@ -43,15 +43,15 @@ export default async function handler(req, res) {
   const { message } = req.body;
   const validation = validateChatMessage({ message });
   if (!validation.isValid) {
-    return res.status(400).json({ 
-      error: "Validation failed", 
-      details: validation.errors 
+    return res.status(400).json({
+      error: "Validation failed",
+      details: validation.errors,
     });
   }
 
   try {
-    const foodItems = await prisma.foodItem.findMany({ 
-      include: { category: true } 
+    const foodItems = await prisma.foodItem.findMany({
+      include: { category: true },
     });
 
     const inventoryAnalysis = analyzeInventory(foodItems);
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       expiringSoon: inventoryAnalysis.expiringSoon,
       expired: inventoryAnalysis.expired,
       fresh: inventoryAnalysis.fresh,
-      allItems: foodItems.map(item => ({
+      allItems: foodItems.map((item) => ({
         name: item.name,
         quantity: item.quantity,
         unit: item.unit,
@@ -68,113 +68,119 @@ export default async function handler(req, res) {
         expiryDate: item.expiryDate,
         daysUntilExpiry: item.daysUntilExpiry,
         status: item.status,
-        notes: item.notes
-      }))
+        notes: item.notes,
+      })),
+
+      categories: [...new Set(foodItems.map((item) => item.category.name))],
+      urgentItems: inventoryAnalysis.expiringSoon.filter(
+        (item) => item.urgency === "urgent"
+      ),
+      soonItems: inventoryAnalysis.expiringSoon.filter(
+        (item) => item.urgency === "soon"
+      ),
+      proteinItems: foodItems.filter((item) =>
+        ["meat", "poultry", "seafood", "dairy", "eggs", "beans", "nuts"].some(
+          (cat) => item.category.name.toLowerCase().includes(cat)
+        )
+      ),
+      vegetableItems: foodItems.filter(
+        (item) =>
+          item.category.name.toLowerCase().includes("vegetable") ||
+          item.category.name.toLowerCase().includes("produce")
+      ),
+      pantryItems: foodItems.filter((item) =>
+        ["grains", "cereals", "pasta", "rice", "bread", "canned"].some((cat) =>
+          item.category.name.toLowerCase().includes(cat)
+        )
+      ),
     };
 
-    const systemPrompt = `You are an intelligent kitchen assistant and inventory manager. Your role is to help users manage their food inventory, suggest recipes, and provide shopping recommendations.
+    const systemPrompt = `You are "Chef AI", a helpful kitchen assistant. Be proactive but ask permission before providing detailed suggestions.
 
 INVENTORY CONTEXT:
 - Total items: ${inventoryContext.totalItems}
-- Items expiring soon (≤7 days): ${inventoryAnalysis.expiringSoon.length}
-- Expired items: ${inventoryAnalysis.expired.length}
-- Fresh items: ${inventoryAnalysis.fresh.length}
+- Urgent items (≤3 days): ${inventoryContext.urgentItems.length}
+- Soon items (4-7 days): ${inventoryContext.soonItems.length}
 
-DETAILED INVENTORY:
-${JSON.stringify(inventoryContext.allItems, null, 2)}
+URGENT ITEMS:
+${inventoryContext.urgentItems
+  .map(
+    (item) =>
+      `- ${item.name} (${item.daysUntilExpiry} days left)`
+  )
+  .join("\n")}
 
-YOUR CAPABILITIES:
-1. **Expiry Alerts**: Identify items expiring soon and suggest immediate action
-2. **Recipe Suggestions**: Recommend recipes using available items, prioritizing expiring ones
-3. **Shopping Lists**: Identify missing ingredients for recipes and suggest what to buy
-4. **Inventory Management**: Provide tips for better food storage and waste reduction
-5. **Meal Planning**: Suggest meal plans based on available ingredients
+EXPIRING SOON:
+${inventoryContext.soonItems
+  .map(
+    (item) =>
+      `- ${item.name} (${item.daysUntilExpiry} days left)`
+  )
+  .join("\n")}
 
-RESPONSE FORMAT:
-Respond ONLY with a valid JSON object (no markdown, no code blocks, no extra text). Use this exact format:
-{
-  "reply": "Brief conversational response (max 2 sentences)",
-  "expiringSoon": [
-    {
-      "name": "Item name",
-      "daysLeft": 2,
-      "urgency": "urgent|soon",
-      "suggestion": "One specific action"
-    }
-  ],
-  "suggestedRecipes": [
-    {
-      "name": "Recipe name",
-      "ingredients": ["ingredient1", "ingredient2"],
-      "usesExpiring": true,
-      "missingIngredients": ["missing1"],
-      "instructions": "One sentence cooking instruction"
-    }
-  ],
-  "shoppingSuggestions": [
-    {
-      "item": "Item to buy",
-      "reason": "Brief reason",
-      "priority": "high|medium|low"
-    }
-  ],
-  "inventoryTips": [
-    "One helpful tip"
-  ]
-}
+CONVERSATION CONTEXT:
+- If urgent items exist: Mention them briefly and offer help
+- If no urgent items but expiring soon: Offer recipe suggestions
+- If user asks about recipes: Provide 1-2 ideas and ask for more
+- If user asks general questions: Answer directly and offer inventory help
 
-IMPORTANT RULES:
-- Always prioritize expiring items in your suggestions
-- Keep responses concise and practical
-- Limit to 3 expiring items, 2 recipes, 3 shopping items, 2 tips max
-- Be specific about quantities and measurements
-- If suggesting recipes, check if all ingredients are available
-- For missing ingredients, suggest specific items to buy
-- Be encouraging and helpful in your tone
-- Respond ONLY with valid JSON, no markdown formatting`;
+RESPONSE STRATEGY:
+- For greetings: Be friendly and mention if there are urgent items, then ask what they'd like help with
+- For simple questions: Answer directly but offer to help with inventory if relevant
+- For inventory questions: Provide helpful details and ask follow-up questions
+- For recipe requests: Give 1-2 suggestions and ask if they want more options
+- Always ask permission before providing extensive lists or detailed analysis
+- Be conversational and engaging, not robotic
 
+EXAMPLES:
+- "Hey! I notice you have some items expiring soon. Would you like me to suggest some recipes to use them up?"
+- "I can help with that! Would you like me to check your inventory for relevant items?"
+- "Here are a couple of ideas: [suggestion]. Would you like more options or help with something specific?"`;
+
+    const isGreeting = /^(hi|hello|hey|hiya|sup|what's up|howdy|good morning|good afternoon|good evening)$/i.test(message.trim());
+    const isSimpleQuestion = message.trim().length < 20 && !message.includes('recipe') && !message.includes('cook') && !message.includes('food');
+    
     const userPrompt = `User message: "${message}"
 
-Please analyze the inventory and provide helpful suggestions based on the user's request. Focus on:
-1. Items that are expiring soon and need immediate attention
-2. Recipe suggestions that use available ingredients
-3. Shopping recommendations for missing items
-4. Any inventory management tips`;
+${isGreeting ? 'This appears to be a greeting. Be friendly and mention urgent items if any, then ask what they need help with.' : ''}
+${isSimpleQuestion ? 'This is a simple question. Answer directly and offer to help with inventory if relevant.' : ''}
+
+Respond naturally and be helpful. If there are urgent items, mention them briefly and ask if they want help. For recipe or food questions, provide 1-2 suggestions and ask if they want more. Always ask permission before giving extensive details.`;
 
     const requestBody = {
       contents: [
         {
           parts: [
             {
-              text: `${systemPrompt}\n\n${userPrompt}`
-            }
-          ]
-        }
+              text: `${systemPrompt}\n\n${userPrompt}`,
+            },
+          ],
+        },
       ],
       generationConfig: {
-        temperature: 0.3,
+        temperature: 0.4,
         topK: 20,
         topP: 0.8,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 400,
       },
       safetySettings: [
         {
           category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          threshold: "BLOCK_MEDIUM_AND_ABOVE",
         },
         {
           category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          threshold: "BLOCK_MEDIUM_AND_ABOVE",
         },
         {
           category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          threshold: "BLOCK_MEDIUM_AND_ABOVE",
         },
         {
           category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        }
-      ]
+          threshold: "BLOCK_MEDIUM_AND_ABOVE",
+        },
+      ],
     };
 
     const response = await fetch(
@@ -189,65 +195,49 @@ Please analyze the inventory and provide helpful suggestions based on the user's
     );
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Gemini API error: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
     console.log("Gemini API response:", JSON.stringify(data, null, 2));
 
     const generatedContent = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+
     if (!generatedContent) {
       throw new Error("No content generated by Gemini API");
     }
 
     let cleanedContent = generatedContent.trim();
-    if (cleanedContent.startsWith('```json')) {
-      cleanedContent = cleanedContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-    } else if (cleanedContent.startsWith('```')) {
-      cleanedContent = cleanedContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
-    }
-    
-    let aiResponse;
-    try {
-      aiResponse = JSON.parse(cleanedContent);
-    } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", parseError);
-      console.error("Cleaned content:", cleanedContent);
-      aiResponse = {
-        reply: generatedContent,
-        expiringSoon: inventoryAnalysis.expiringSoon.slice(0, 3).map(item => ({
-          name: item.name,
-          daysLeft: item.daysUntilExpiry,
-          urgency: item.urgency,
-          suggestion: `Use within ${item.daysUntilExpiry} days`
-        })),
-        suggestedRecipes: [],
-        shoppingSuggestions: [],
-        inventoryTips: ["Check your inventory regularly to avoid waste"]
-      };
+    if (cleanedContent.startsWith("```")) {
+      cleanedContent = cleanedContent
+        .replace(/^```\w*\s*/, "")
+        .replace(/\s*```$/, "");
     }
 
     const finalResponse = {
-      reply: aiResponse.reply || "I'm here to help with your inventory management!",
-      expiringSoon: aiResponse.expiringSoon || [],
-      suggestedRecipes: aiResponse.suggestedRecipes || [],
-      shoppingSuggestions: aiResponse.shoppingSuggestions || [],
-      inventoryTips: aiResponse.inventoryTips || [],
+      reply:
+        cleanedContent ||
+        "Hey there! I'm Chef AI, your friendly kitchen assistant. What would you like to chat about today?",
+      showSuggestions: false,
+      expiringSoon: [],
+      suggestedRecipes: [],
+      shoppingSuggestions: [],
+      inventoryTips: [],
       inventorySummary: {
         totalItems: inventoryContext.totalItems,
         expiringCount: inventoryAnalysis.expiringSoon.length,
-        expiredCount: inventoryAnalysis.expired.length
-      }
+        expiredCount: inventoryAnalysis.expired.length,
+      },
     };
 
     res.status(200).json(finalResponse);
-
   } catch (error) {
     console.error("Error in chat endpoint:", error);
-    res.status(500).json({ 
-      error: "Failed to process your request", 
-      details: error.message 
+    res.status(500).json({
+      error: "Failed to process your request",
+      details: error.message,
     });
   }
 }
