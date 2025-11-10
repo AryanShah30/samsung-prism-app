@@ -1,3 +1,14 @@
+/**
+ * SuggestionsScreen – AI + heuristic suggestions surfaced outside chat context.
+ *
+ * Features:
+ *  - Fetch aggregated suggestions list.
+ *  - Categorizes suggestion types for icon/color semantics.
+ *  - Supports pull-to-refresh.
+ *
+ * Future:
+ *  - Deep link into specific recipes or multi-item optimization workflows.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -57,15 +68,15 @@ const SuggestionsScreen = ({ navigation }) => {
   const getSuggestionColor = (type) => {
     switch (type) {
       case 'recipe':
-        return Colors.success;
+        return Colors.success[500];
       case 'expiring':
-        return Colors.warning;
+        return Colors.warning[500];
       case 'waste':
-        return Colors.danger;
+        return Colors.danger[500];
       case 'purchase':
-        return Colors.info;
+        return Colors.info[500];
       default:
-        return Colors.primary;
+        return Colors.primary[500];
     }
   };
 

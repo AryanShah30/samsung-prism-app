@@ -1,3 +1,14 @@
+/**
+ * ExpiringItemsScreen – list of items approaching expiry (API-provided filtered set).
+ *
+ * Responsibilities:
+ *  - Fetch expiring items via ApiService.getExpiringItems.
+ *  - Provide pull-to-refresh and clear empty state messaging.
+ *  - Visual urgency coloring (<=3 days uses danger shade; otherwise warning).
+ *
+ * Data assumptions:
+ *  - Each item contains `daysUntilExpiry` already computed server-side for consistency.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -71,7 +82,7 @@ const ExpiringItemsScreen = ({ navigation }) => {
 
       {items.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="checkmark-circle" size={64} color={Colors.success} />
+          <Ionicons name="checkmark-circle" size={64} color={Colors.success[500]} />
           <Text style={styles.emptyTitle}>All Good!</Text>
           <Text style={styles.emptySubtitle}>No items are expiring soon</Text>
         </View>
@@ -85,7 +96,7 @@ const ExpiringItemsScreen = ({ navigation }) => {
               <Card key={item.id} style={styles.itemCard}>
                 <View style={styles.itemContent}>
                   <View style={[styles.categoryIcon, { backgroundColor: categoryColor }]}>
-                    <CategoryIcon size={24} color={Colors.primary} />
+                    <CategoryIcon size={24} color={Colors.primary[500]} />
                   </View>
                   <View style={styles.itemDetails}>
                     <Text style={styles.itemName}>{item.name}</Text>
@@ -101,7 +112,7 @@ const ExpiringItemsScreen = ({ navigation }) => {
                     <StatusIcon daysUntilExpiry={item.daysUntilExpiry} size={20} />
                     <Text style={[
                       styles.daysText,
-                      { color: item.daysUntilExpiry <= 3 ? Colors.danger : Colors.warning }
+                      { color: item.daysUntilExpiry <= 3 ? Colors.danger[500] : Colors.warning[500] }
                     ]}>
                       {item.daysUntilExpiry} days left
                     </Text>

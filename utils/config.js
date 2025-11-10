@@ -1,8 +1,15 @@
+/**
+ * Global configuration constants used by both server and client.
+ */
 export const EXPIRY_THRESHOLDS = {
   URGENT_DAYS: 3,
   SOON_DAYS: 7,
 };
 
+/**
+ * Validation rules for categories, items, and notes.
+ * Keep patterns permissive for common punctuation yet protective against injection.
+ */
 export const VALIDATION_RULES = {
   CATEGORY_NAME: {
     MIN_LENGTH: 2,

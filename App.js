@@ -1,3 +1,14 @@
+/**
+ * App root – sets up NavigationContainer with bottom tab navigator.
+ *
+ * Structure:
+ *  - Tabs: Dashboard (stack), Inventory (stack), AI Chat (stack).
+ *  - Each tab hides header for immersive layouts; custom tab bar styling for elevated floating effect.
+ *
+ * Notes:
+ *  - DashboardStack includes routes for expiring/expired items & suggestions.
+ *  - Consider lazy loading stacks if startup performance needs optimization.
+ */
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

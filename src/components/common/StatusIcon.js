@@ -1,3 +1,13 @@
+/**
+ * StatusIcon – visual indicator for item freshness/expiry with animated pulse.
+ *
+ * Variants:
+ *  - 'dot': simple colored circle (default)
+ *  - 'badge': pill + dot + label
+ *  - 'pill': pill + label only
+ *
+ * Pulsing behavior triggers for critical/expiring states to attract attention.
+ */
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Text } from 'react-native';
 import { Colors } from '../../constants/colors';

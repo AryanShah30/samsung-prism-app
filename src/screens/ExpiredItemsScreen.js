@@ -1,3 +1,11 @@
+/**
+ * ExpiredItemsScreen – shows items whose `daysUntilExpiry` < 0.
+ *
+ * Responsibilities:
+ *  - Client-side filtering of all items (avoid separate endpoint call for simplicity).
+ *  - Present elapsed time since expiry ("X days ago").
+ *  - Provide celebratory empty state when no expired items exist.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -75,7 +83,7 @@ const ExpiredItemsScreen = ({ navigation }) => {
 
       {items.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="checkmark-circle" size={64} color={Colors.success} />
+          <Ionicons name="checkmark-circle" size={64} color={Colors.success[500]} />
           <Text style={styles.emptyTitle}>Nothing Yet!</Text>
           <Text style={styles.emptySubtitle}>No items have expired recently</Text>
         </View>
@@ -90,7 +98,7 @@ const ExpiredItemsScreen = ({ navigation }) => {
               <Card key={item.id} style={styles.itemCard}>
                 <View style={styles.itemContent}>
                   <View style={[styles.categoryIcon, { backgroundColor: categoryColor }]}>
-                    <CategoryIcon size={24} color={Colors.primary} />
+                    <CategoryIcon size={24} color={Colors.primary[500]} />
                   </View>
                   <View style={styles.itemDetails}>
                     <Text style={styles.itemName}>{item.name}</Text>
@@ -209,7 +217,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     marginTop: 4,
-    color: Colors.danger,
+  color: Colors.danger[500],
   },
 });
 

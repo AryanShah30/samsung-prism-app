@@ -1,3 +1,11 @@
+/**
+ * Button – actionable element supporting variants, sizes, loading state and icons.
+ *
+ * Variants: primary | secondary | outline | ghost | danger
+ * Sizes: small | medium | large
+ * Loading: shows spinner, suppresses text/icons
+ * Disabled: prevents press; dims style
+ */
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Colors } from '../../constants/colors';
@@ -39,7 +47,7 @@ const Button = ({
       return (
         <ActivityIndicator 
           size="small" 
-          color={variant === 'outline' || variant === 'ghost' ? Colors.primary : Colors.text.white} 
+          color={variant === 'outline' || variant === 'ghost' ? Colors.primary[500] : Colors.text.white} 
         />
       );
     }
@@ -81,7 +89,7 @@ const styles = StyleSheet.create({
   },
   
   primary: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.primary[500],
     borderWidth: 0,
   },
   secondary: {
@@ -92,14 +100,14 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: Colors.primary[500],
   },
   ghost: {
     backgroundColor: 'transparent',
     borderWidth: 0,
   },
   danger: {
-    backgroundColor: Colors.danger,
+    backgroundColor: Colors.danger[500],
     borderWidth: 0,
   },
   
@@ -145,10 +153,10 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
   },
   outlineText: {
-    color: Colors.primary,
+    color: Colors.primary[500],
   },
   ghostText: {
-    color: Colors.primary,
+    color: Colors.primary[500],
   },
   dangerText: {
     color: Colors.text.white,

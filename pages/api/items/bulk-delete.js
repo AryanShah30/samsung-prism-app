@@ -1,3 +1,11 @@
+/**
+ * Bulk delete items endpoint (/api/items/bulk-delete)
+ *
+ * Method: POST
+ * Body: { itemIds: number[] }
+ * - Deletes existing items with ids in the provided list.
+ * - Returns counts and lists of deleted vs not-found ids.
+ */
 import { prisma } from "../../../lib/prisma";
 
 export default async function handler(req, res) {

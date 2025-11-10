@@ -1,3 +1,14 @@
+/**
+ * Items collection endpoint (/api/items)
+ *
+ * Supported Methods:
+ * GET  - List all food items with their category.
+ * POST - Create a new food item; maps client `quantity`/`unit` -> DB `volume`/`volumeUnit`.
+ *
+ * Data Integrity:
+ * - Validation performed via `validateFoodItem`.
+ * - Derived fields (status, daysUntilExpiry) computed server-side to ensure consistency.
+ */
 import { prisma } from "../../../lib/prisma";
 import { calculateStatusAndDays } from "../../../utils/status";
 import { validateFoodItem } from "../../../utils/validation";
@@ -55,6 +66,7 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Failed to create food item" });
     }
   } else {
-    res.status(405).json({ error: "Method not allowed" });
+    // Method not supported; communicate allowed operations.
+    res.status(405).json({ error: "Method not allowed", allowed: ["GET", "POST"] });
   }
 }

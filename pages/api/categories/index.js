@@ -1,3 +1,10 @@
+/**
+ * Categories collection endpoint (/api/categories)
+ *
+ * Supported Methods:
+ * GET  - List categories ordered by name.
+ * POST - Create a new unique category (validated).
+ */
 import { prisma } from "../../../lib/prisma";
 import { validateCategory } from "../../../utils/validation";
 
@@ -38,6 +45,6 @@ export default async function handler(req, res) {
       }
     }
   } else {
-    res.status(405).json({ error: "Method not allowed" });
+    res.status(405).json({ error: "Method not allowed", allowed: ["GET", "POST"] });
   }
 }

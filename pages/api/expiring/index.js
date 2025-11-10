@@ -1,3 +1,11 @@
+/**
+ * Expiring items endpoint (/api/expiring)
+ *
+ * Method: GET
+ * Query: days?=number (defaults to SOON_DAYS)
+ * - Returns items with daysUntilExpiry <= threshold, ordered ascending.
+ * - Includes a summary payload for quick UI badges.
+ */
 import { prisma } from "../../../lib/prisma";
 import { EXPIRY_THRESHOLDS } from "../../../utils/config";
 

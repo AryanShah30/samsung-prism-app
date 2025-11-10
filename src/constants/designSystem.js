@@ -1,5 +1,21 @@
+/**
+ * Central design system tokens and component-level variants.
+ *
+ * This module provides immutable style primitives (spacing, typography, radii, shadows)
+ * plus opinionated variants for common UI elements. Keeping these centralized:
+ *  - Enables consistent visual language across React Native & any web surfaces
+ *  - Simplifies future theming (dark mode) by swapping underlying `Colors` only
+ *  - Encourages composition instead of ad-hoc numeric literals scattered in components
+ *
+ * Extensibility guidelines:
+ *  - Add new spacing sizes in ascending order; avoid fractional pixel values.
+ *  - Typography scale follows a modular scale; prefer reusing existing steps.
+ *  - Shadows map to elevation for Android while retaining iOS shadow props.
+ *  - ComponentVariants should remain purely presentational (no logic flags).
+ */
 import { Colors } from './colors';
 
+/** Spacing scale (px) – used for margin & padding; mobile friendly increments. */
 export const Spacing = {
   xs: 4,    
   sm: 8,     
@@ -15,6 +31,7 @@ export const Spacing = {
   '8xl': 96,  
 };
 
+/** Typography tokens – font sizes, weights, line heights, letter spacing. */
 export const Typography = {
   fontSize: {
     xs: 12,
@@ -55,6 +72,7 @@ export const Typography = {
   },
 };
 
+/** Corner radius scale – semantic sizing for rounded UI elements. */
 export const BorderRadius = {
   none: 0,
   sm: 4,
@@ -67,6 +85,7 @@ export const BorderRadius = {
   full: 9999,
 };
 
+/** Cross-platform shadow presets. */
 export const Shadows = {
   none: {
     shadowColor: 'transparent',
@@ -105,10 +124,15 @@ export const Shadows = {
   },
 };
 
+/** Retrieve a shadow style object by size key. */
 export const getShadow = (size = 'sm') => {
   return Shadows[size] || Shadows.sm;
 };
 
+/**
+ * Pre-defined presentational variants for common primitives.
+ * Colors reference current light theme; adapt for dark theme by swapping palette.
+ */
 export const ComponentVariants = {
   button: {
     primary: {
@@ -180,6 +204,7 @@ export const ComponentVariants = {
   },
 };
 
+/** Layout sizing conventions for macro UI elements. */
 export const Layout = {
   screenPadding: Spacing.lg,
   
@@ -211,6 +236,7 @@ export const Layout = {
   },
 };
 
+/** Standardized animation duration tokens (ms). */
 export const Animation = {
   fast: 150,
   normal: 250,
@@ -218,6 +244,7 @@ export const Animation = {
   slower: 500,
 };
 
+/** Layering scale for stacking contexts. */
 export const ZIndex = {
   hide: -1,
   auto: 'auto',

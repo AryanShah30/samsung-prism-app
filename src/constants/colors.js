@@ -1,30 +1,31 @@
+// Consolidated color system: expose shade maps and add base shortcuts for common brand colors.
+// Use Colors.primary[500] (or other shade) instead of Colors.primary. Base shortcuts (primaryBase, successBase, etc.)
+// are provided for places that need a single hex value.
 export const Colors = {
   primary: {
     50: "#EEF2FF",
-    100: "#E0E7FF", 
+    100: "#E0E7FF",
     200: "#C7D2FE",
     300: "#A5B4FC",
     400: "#818CF8",
-    500: "#6366F1", 
+    500: "#6366F1",
     600: "#4F46E5",
     700: "#4338CA",
     800: "#3730A3",
     900: "#312E81",
   },
-  
   secondary: {
     50: "#F5F3FF",
     100: "#EDE9FE",
     200: "#DDD6FE",
     300: "#C4B5FD",
     400: "#A78BFA",
-    500: "#8B5CF6", 
+    500: "#8B5CF6",
     600: "#7C3AED",
     700: "#6D28D9",
     800: "#5B21B6",
     900: "#4C1D95",
   },
-
   success: {
     50: "#ECFDF5",
     100: "#D1FAE5",
@@ -37,7 +38,6 @@ export const Colors = {
     800: "#065F46",
     900: "#064E3B",
   },
-  
   warning: {
     50: "#FFFBEB",
     100: "#FEF3C7",
@@ -50,7 +50,6 @@ export const Colors = {
     800: "#92400E",
     900: "#78350F",
   },
-  
   danger: {
     50: "#FEF2F2",
     100: "#FEE2E2",
@@ -63,27 +62,24 @@ export const Colors = {
     800: "#991B1B",
     900: "#7F1D1D",
   },
-  
   info: {
     50: "#ECFEFF",
     100: "#CFFAFE",
     200: "#A5F3FC",
     300: "#67E8F9",
     400: "#22D3EE",
-    500: "#06B6D4", 
+    500: "#06B6D4",
     600: "#0891B2",
     700: "#0E7490",
     800: "#155E75",
     900: "#164E63",
   },
-
   status: {
     fresh: "#10B981",
-    expiring: "#F59E0B", 
+    expiring: "#F59E0B",
     expired: "#EF4444",
-    critical: "#DC2626", 
+    critical: "#DC2626",
   },
-
   gray: {
     25: "#FCFCFD",
     50: "#F9FAFB",
@@ -98,61 +94,55 @@ export const Colors = {
     900: "#111827",
     950: "#030712",
   },
-
   text: {
-    primary: "#111827",    
-    secondary: "#4B5563",   
-    tertiary: "#6B7280",    
-    muted: "#9CA3AF",       
+    primary: "#111827",
+    secondary: "#4B5563",
+    tertiary: "#6B7280",
+    muted: "#9CA3AF",
     white: "#FFFFFF",
-    inverse: "#F9FAFB",    
+    inverse: "#F9FAFB",
   },
-
   background: {
-    primary: "#FFFFFF",      
-    secondary: "#F9FAFB",  
-    tertiary: "#F3F4F6",     
-    accent: "#F0F9FF",      
-    card: "#FFFFFF",         
-    overlay: "rgba(0, 0, 0, 0.5)", 
+    primary: "#FFFFFF",
+    secondary: "#F9FAFB",
+    tertiary: "#F3F4F6",
+    accent: "#F0F9FF",
+    card: "#FFFFFF",
+    overlay: "rgba(0, 0, 0, 0.5)",
   },
-
   border: {
     light: "#F3F4F6",
-    medium: "#E5E7EB", 
+    medium: "#E5E7EB",
     dark: "#D1D5DB",
-    focus: "#6366F1",      
+    focus: "#6366F1",
   },
-
   shadow: {
     sm: "rgba(0, 0, 0, 0.05)",
     md: "rgba(0, 0, 0, 0.1)",
     lg: "rgba(0, 0, 0, 0.15)",
     xl: "rgba(0, 0, 0, 0.25)",
   },
-
   categories: {
-    fruits: "#FEF3C7",       
-    vegetables: "#D1FAE5",  
-    dairy: "#DBEAFE",        
-    grains: "#F3E8FF",       
-    meat: "#FEE2E2",       
-    seafood: "#ECFDF5",    
-    beverages: "#FDF2F8",   
-    snacks: "#FEF9C3",     
-    frozen: "#E0F2FE",      
-    canned: "#F0FDF4",      
-    spices: "#FEF3C7",      
+    fruits: "#FEF3C7",
+    vegetables: "#D1FAE5",
+    dairy: "#DBEAFE",
+    grains: "#F3E8FF",
+    meat: "#FEE2E2",
+    seafood: "#ECFDF5",
+    beverages: "#FDF2F8",
+    snacks: "#FEF9C3",
+    frozen: "#E0F2FE",
+    canned: "#F0FDF4",
+    spices: "#FEF3C7",
     condiments: "#FDF2F8",
   },
-
-  primary: "#6366F1",
-  secondary: "#8B5CF6", 
-  accent: "#EC4899",
-  success: "#10B981",
-  warning: "#F59E0B",
-  danger: "#EF4444",
-  info: "#06B6D4",
+  // Base shortcuts for convenience (prefer explicit shade indexes in new code)
+  primaryBase: "#6366F1",
+  secondaryBase: "#8B5CF6",
+  successBase: "#10B981",
+  warningBase: "#F59E0B",
+  dangerBase: "#EF4444",
+  infoBase: "#06B6D4",
   light: "#FAFAFA",
   white: "#FFFFFF",
   black: "#1F2937",

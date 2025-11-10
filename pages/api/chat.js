@@ -1,8 +1,21 @@
+/**
+ * Chat completion endpoint (/api/chat)
+ *
+ * Method: POST
+ * Body: { message: string }
+ * - Validates message, loads inventory context, crafts a system prompt and user prompt
+ *   then calls Gemini API for a contextual reply.
+ * - Returns a normalized reply plus summary sections for potential UI expansion.
+ * - Handles quota / error cases with clear status codes.
+ */
 import { prisma } from "../../lib/prisma";
 import fetch from "node-fetch";
 import { validateChatMessage } from "../../utils/validation";
 import { EXPIRY_THRESHOLDS } from "../../utils/config";
 
+/**
+ * Classify items into urgency buckets used to build conversational context.
+ */
 function analyzeInventory(foodItems) {
   const expiringSoon = [];
   const expired = [];

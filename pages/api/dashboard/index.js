@@ -1,3 +1,13 @@
+/**
+ * Dashboard summary endpoint (/api/dashboard)
+ *
+ * Method: GET
+ * Aggregates:
+ * - Key metrics (total, expiring soon, expired)
+ * - Top-5 expiring soon and recently expired lists
+ * - Category counts and recent items
+ * - Placeholder analytics and AI suggestions preview
+ */
 import { prisma } from "../../../lib/prisma";
 import { EXPIRY_THRESHOLDS } from "../../../utils/config";
 

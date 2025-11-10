@@ -1,3 +1,16 @@
+/**
+ * ItemDetailsScreen – create/edit form for a single inventory item.
+ *
+ * Behavior:
+ *  - Distinguishes new vs existing item via `id === 0` sentinel.
+ *  - Validates required fields locally before submission.
+ *  - Uses grams as canonical volume unit (quantity) – server defaults to 'g'.
+ *  - Lazy loads categories for selection modal.
+ *
+ * Post-save:
+ *  - On create: transitions into edit state with returned item.
+ *  - On delete: navigates back to parent list.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -142,9 +155,9 @@ const ItemDetailsScreen = ({ route, navigation }) => {
   };
 
   const getStatusColor = (daysUntilExpiry) => {
-    if (daysUntilExpiry < 0) return Colors.danger;
-    if (daysUntilExpiry <= 3) return Colors.warning;
-    return Colors.success;
+  if (daysUntilExpiry < 0) return Colors.danger[500];
+  if (daysUntilExpiry <= 3) return Colors.warning[500];
+  return Colors.success[500];
   };
 
   return (
@@ -159,7 +172,7 @@ const ItemDetailsScreen = ({ route, navigation }) => {
         <View style={styles.headerActions}>
           {!isNewItem && (
             <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-              <Ionicons name="trash-outline" size={24} color={Colors.danger} />
+              <Ionicons name="trash-outline" size={24} color={Colors.danger[500]} />
             </TouchableOpacity>
           )}
         </View>
@@ -301,7 +314,7 @@ const ItemDetailsScreen = ({ route, navigation }) => {
                     {category.name}
                   </Text>
                   {formData.categoryId === category.id && (
-                    <Ionicons name="checkmark" size={20} color={Colors.primary} />
+                    <Ionicons name="checkmark" size={20} color={Colors.primary[500]} />
                   )}
                 </TouchableOpacity>
               )}
@@ -431,13 +444,13 @@ const styles = StyleSheet.create({
   },
   unitOptionSelected: {
     backgroundColor: Colors.primary[50],
-    borderColor: Colors.primary,
+  borderColor: Colors.primary[500],
   },
   unitOptionText: {
     color: Colors.text.primary,
   },
   unitOptionTextSelected: {
-    color: Colors.primary,
+  color: Colors.primary[500],
     fontWeight: '600',
   },
   quantityInput: {
@@ -524,14 +537,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectedCategoryItem: {
-    backgroundColor: Colors.primary + '20',
+  backgroundColor: Colors.primary[50],
   },
   categoryItemText: {
     fontSize: 16,
     color: Colors.text.primary,
   },
   selectedCategoryItemText: {
-    color: Colors.primary,
+  color: Colors.primary[500],
     fontWeight: '600',
   },
 });

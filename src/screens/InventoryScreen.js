@@ -1,3 +1,19 @@
+/**
+ * InventoryScreen module – wraps a stack navigator containing:
+ *  - CategoryListScreen: Browse/search categories, toggle layout (grid/list), optional image detection entry point.
+ *  - ItemListScreen: Items scoped to a category with quick add and paging logic (show more toggle).
+ *  - ItemDetailsScreen & CategoryManagementScreen are mounted in the stack for deep navigation.
+ *
+ * Features:
+ *  - Image detection integration (camera / gallery) -> prefill new item dialog.
+ *  - Expiring item counts per category (computed client-side for quick badge display).
+ *  - View mode state (grid vs list) with layout-specific rendering.
+ *  - Pull-to-refresh for categories & items.
+ *
+ * Notes:
+ *  - Detection logic prompts user for adding item only when useful inference fields exist.
+ *  - All color + spacing references leverage the design system tokens.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -202,13 +218,13 @@ const CategoryListScreen = ({ navigation }) => {
               style={[styles.viewModeButton, viewMode === 'grid' && styles.viewModeButtonActive]}
               onPress={() => setViewMode('grid')}
             >
-              <Grid3X3 size={20} color={viewMode === 'grid' ? Colors.primary : Colors.gray[500]} />
+              <Grid3X3 size={20} color={viewMode === 'grid' ? Colors.primary[500] : Colors.gray[500]} />
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.viewModeButton, viewMode === 'list' && styles.viewModeButtonActive]}
               onPress={() => setViewMode('list')}
             >
-              <List size={20} color={viewMode === 'list' ? Colors.primary : Colors.gray[500]} />
+              <List size={20} color={viewMode === 'list' ? Colors.primary[500] : Colors.gray[500]} />
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.cameraButton}
@@ -220,7 +236,7 @@ const CategoryListScreen = ({ navigation }) => {
                 ]);
               }}
             >
-              <Camera size={20} color={Colors.primary} />
+              <Camera size={20} color={Colors.primary[500]} />
             </TouchableOpacity>
           </View>
         </View>
@@ -240,7 +256,7 @@ const CategoryListScreen = ({ navigation }) => {
             style={[styles.filterButton, showOnlyExpiring && styles.filterButtonActive]} 
             onPress={() => setShowOnlyExpiring(v => !v)}
           >
-            <Filter size={20} color={showOnlyExpiring ? Colors.warning : Colors.gray[500]} />
+            <Filter size={20} color={showOnlyExpiring ? Colors.warning[500] : Colors.gray[500]} />
           </TouchableOpacity>
         </View>
         
@@ -281,7 +297,7 @@ const CategoryListScreen = ({ navigation }) => {
               }
             }}
           >
-            <Plus size={20} color={Colors.primary} />
+            <Plus size={20} color={Colors.primary[500]} />
             <Text style={[styles.actionButtonText, styles.addButtonText]}>Add Category</Text>
           </TouchableOpacity>
         </View>
@@ -317,7 +333,7 @@ const CategoryListScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('ItemList', { category })}
             >
               <View style={styles.categoryIconContainer}>
-                <CategoryIcon size={viewMode === 'grid' ? 32 : 24} color={Colors.primary} />
+                <CategoryIcon size={viewMode === 'grid' ? 32 : 24} color={Colors.primary[500]} />
               </View>
               <View style={styles.categoryContent}>
                 <Text style={styles.categoryName}>{category.name}</Text>
@@ -410,7 +426,7 @@ const ItemListScreen = ({ route, navigation }) => {
             daysUntilExpiry: 7 
           } 
         })}>
-          <Plus size={24} color={Colors.primary} />
+          <Plus size={24} color={Colors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -424,7 +440,7 @@ const ItemListScreen = ({ route, navigation }) => {
               onPress={() => navigation.navigate('ItemDetails', { item })}
             >
               <View style={styles.itemIconContainer}>
-                <CategoryIcon size={28} color={Colors.primary} />
+                <CategoryIcon size={28} color={Colors.primary[500]} />
               </View>
               <View style={styles.itemNameContainer}>
                 <Text style={styles.itemName}>{item.name}</Text>
@@ -599,7 +615,7 @@ const styles = StyleSheet.create({
     color: Colors.gray[600],
   },
   addButtonText: {
-    color: Colors.primary,
+  color: Colors.primary[500],
   },
   
   categoriesGrid: {
@@ -726,7 +742,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.success,
+    backgroundColor: Colors.success[500],
   },
   viewAllButton: {
     marginHorizontal: Spacing.lg,

@@ -1,3 +1,12 @@
+/**
+ * Card – surface container with variants for elevation and density.
+ *
+ * Props:
+ *  - variant: 'default' | 'elevated' | 'outlined' | 'filled'
+ *  - padding: 'none' | 'sm' | 'default' | 'lg'
+ *  - onPress: if provided, renders TouchableOpacity; otherwise a View
+ *  - disabled: visual dim + disables press handling
+ */
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors } from '../../constants/colors';

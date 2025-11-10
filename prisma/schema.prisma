@@ -1,3 +1,9 @@
+/// Prisma schema for Inventory App data model.
+///
+/// Tech stack: PostgreSQL + Prisma Client.
+/// Notes:
+/// - `FoodItem.volume` stores quantity (grams by default via `volumeUnit`).
+/// - Derived fields (`daysUntilExpiry`, `status`) are maintained by API logic.
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,25 +13,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// Top-level grouping for items (e.g., Fruits, Vegetables, Dairy).
 model Category {
+  /// Primary key.
   id    Int        @id @default(autoincrement())
+  /// Unique category display name.
   name  String     @unique
+  /// One-to-many relationship to items.
   items FoodItem[]
 }
 
+/// Individual inventory item with expiry tracking.
 model FoodItem {
+  /// Primary key.
   id              Int      @id @default(autoincrement())
+  /// Item display name.
   name            String
+  /// Quantity value (see `volumeUnit`).
   volume          Float
+  /// Unit for `volume` (defaults to grams).
   volumeUnit      String   @default("g")
+  /// When the item was created.
   dateAdded       DateTime @default(now())
+  /// Expiration date.
   expiryDate      DateTime
+  /// Days remaining until expiry (negative if expired).
   daysUntilExpiry Int
+  /// Derived status label: "Fresh" | "Expiring Soon" | "Expired".
   status          String
+  /// Optional free-form notes.
   notes           String?
+  /// Foreign key to `Category`.
   categoryId      Int
+  /// Relation to category.
   category        Category @relation(fields: [categoryId], references: [id])
 
+  /// Indexes to support common queries and filtering.
   @@index([daysUntilExpiry])
   @@index([status])
   @@index([expiryDate])

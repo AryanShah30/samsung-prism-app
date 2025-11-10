@@ -1,13 +1,22 @@
-import { spawn } from 'child_process';
-import path from 'path';
+/**
+ * Image detection endpoint (/api/detect)
+ *
+ * Method: POST (multipart/form-data)
+ * Field: image | file | photo (first present)
+ * - Accepts an uploaded image, forwards to Gemini 2.5 Flash model for lightweight
+ *   food recognition and estimation (label, confidence, expiry days, volume, category).
+ * - Returns a normalized JSON response or detailed error info.
+ */
+import { spawn } from 'child_process'; // (presently unused, retained for potential future offline processing)
+import path from 'path'; // (presently unused, kept if future transformations required)
 import fs from 'fs';
 import formidable from 'formidable';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const config = {
   api: {
-    bodyParser: false, // We'll handle multipart form-data via formidable
-    sizeLimit: '10mb',
+    bodyParser: false, // Required to let formidable parse incoming multipart requests.
+    sizeLimit: '10mb', // Reject overly large uploads early.
   },
 };
 
@@ -45,7 +54,7 @@ export default async function handler(req, res) {
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       const b64 = fs.readFileSync(imagePath, { encoding: 'base64' });
 
-      const prompt = `You are a food recognition assistant. Analyze the attached image and RETURN ONLY valid JSON (no extra text) with keys: label (string or null), confidence (number between 0 and 1), estimated_expiry_days (integer, days until expiry), estimated_volume_ml (number, estimated volume in milliliters), and category (string or null). Example: {"label":"apple","confidence":0.92,"estimated_expiry_days":7,"estimated_volume_ml":150,"category":"Fruits"}. If you cannot identify a value, use null or 0 as appropriate.`;
+    const prompt = `You are a food recognition assistant. Analyze the attached image and RETURN ONLY valid JSON (no extra text) with keys: label (string or null), confidence (number between 0 and 1), estimated_expiry_days (integer, days until expiry), estimated_volume_ml (number, estimated volume in milliliters), and category (string or null). Example: {"label":"apple","confidence":0.92,"estimated_expiry_days":7,"estimated_volume_ml":150,"category":"Fruits"}. If you cannot identify a value, use null or 0 as appropriate.`;
 
       const result = await model.generateContent([
         { text: prompt },

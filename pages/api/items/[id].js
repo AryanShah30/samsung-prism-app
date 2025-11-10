@@ -1,3 +1,14 @@
+/**
+ * Item resource endpoint (/api/items/[id])
+ *
+ * Supported Methods:
+ * PUT    - Update an existing food item (maps `quantity`/`unit` -> `volume`/`volumeUnit`).
+ * DELETE - Remove the item by id.
+ *
+ * Validation & Derived Fields:
+ * - Validates shape via `validateFoodItem` on PUT.
+ * - Recomputes `status` and `daysUntilExpiry` when `expiryDate` changes.
+ */
 import { prisma } from "../../../lib/prisma";
 import { calculateStatusAndDays } from "../../../utils/status";
 import { validateFoodItem } from "../../../utils/validation";
@@ -68,6 +79,6 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Failed to delete food item" });
     }
   } else {
-    res.status(405).json({ error: "Method not allowed" });
+    res.status(405).json({ error: "Method not allowed", allowed: ["PUT", "DELETE"] });
   }
 }

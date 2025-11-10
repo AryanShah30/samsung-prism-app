@@ -1,5 +1,17 @@
+/**
+ * Input validation utilities.
+ *
+ * These functions perform shallow validation of inbound payloads from the client
+ * prior to database operations. They return a simple shape
+ * `{ isValid: boolean, errors: string[] }` instead of throwing.
+ */
 import { VALIDATION_RULES } from "./config";
 
+/**
+ * Validate create/update payload for FoodItem.
+ * @param {Object} data
+ * @returns {{isValid:boolean, errors:string[]}}
+ */
 export function validateFoodItem(data) {
   const errors = [];
 
@@ -71,6 +83,11 @@ export function validateFoodItem(data) {
   return { isValid: errors.length === 0, errors };
 }
 
+/**
+ * Validate create/update payload for Category.
+ * @param {Object} data
+ * @returns {{isValid:boolean, errors:string[]}}
+ */
 export function validateCategory(data) {
   const errors = [];
 
@@ -102,6 +119,11 @@ export function validateCategory(data) {
   return { isValid: errors.length === 0, errors };
 }
 
+/**
+ * Validate chat message payload.
+ * @param {{message:string}} data
+ * @returns {{isValid:boolean, errors:string[]}}
+ */
 export function validateChatMessage(data) {
   const errors = [];
 

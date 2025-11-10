@@ -1,3 +1,19 @@
+/**
+ * DashboardScreen – high-level overview of inventory health.
+ *
+ * Responsibilities:
+ *  - Fetch aggregated metrics (totals, expiring soon, recently expired) via ApiService.
+ *  - Surface AI suggestions and quick navigation entry points (Expiring / Expired / Suggestions).
+ *  - Present metric cards & list previews with guarded empty states.
+ *
+ * Performance considerations:
+ *  - Single fetch on mount; pull-to-refresh implemented via RefreshControl.
+ *  - Light slicing of arrays for preview (top 2–3 items) with counts for excess items.
+ *
+ * UX notes:
+ *  - Uses semantic color tokens for status emphasis.
+ *  - StatusIcon badge variant provides quick time-left context.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -85,7 +101,7 @@ const DashboardScreen = ({ navigation }) => {
           style={styles.addButton}
           onPress={() => navigation.navigate('Inventory')}
         >
-          <Plus size={20} color={Colors.primary} />
+            <Plus size={20} color={Colors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -94,7 +110,7 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.cardHeader}>
           <View style={styles.titleRow}>
             <View style={styles.iconContainer}>
-              <BarChart3 size={24} color={Colors.primary} />
+              <BarChart3 size={24} color={Colors.primary[500]} />
             </View>
             <Text style={styles.cardTitle}>Key Metrics</Text>
           </View>
@@ -120,7 +136,7 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.cardHeader}>
           <View style={styles.titleRow}>
             <View style={[styles.iconContainer, { backgroundColor: Colors.warning[50] }]}>
-              <Clock size={20} color={Colors.warning} />
+              <Clock size={20} color={Colors.warning[500]} />
             </View>
             <Text style={styles.cardTitle}>Expiring Soon</Text>
           </View>
@@ -163,7 +179,7 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.cardHeader}>
           <View style={styles.titleRow}>
             <View style={[styles.iconContainer, { backgroundColor: Colors.danger[50] }]}>
-              <AlertTriangle size={20} color={Colors.danger} />
+              <AlertTriangle size={20} color={Colors.danger[500]} />
             </View>
             <Text style={styles.cardTitle}>Recently Expired</Text>
           </View>
@@ -206,7 +222,7 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.cardHeader}>
           <View style={styles.titleRow}>
             <View style={[styles.iconContainer, { backgroundColor: Colors.info[50] }]}>
-              <TrendingUp size={20} color={Colors.info} />
+              <TrendingUp size={20} color={Colors.info[500]} />
             </View>
             <Text style={styles.cardTitle}>Waste Trend</Text>
           </View>
@@ -225,7 +241,7 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.cardHeader}>
           <View style={styles.titleRow}>
             <View style={[styles.iconContainer, { backgroundColor: Colors.secondary[50] }]}>
-              <Package size={20} color={Colors.secondary} />
+              <Package size={20} color={Colors.secondary[500]} />
             </View>
             <Text style={styles.cardTitle}>AI Suggestions</Text>
           </View>
@@ -323,7 +339,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: Typography.fontSize.lg,
-    color: Colors.danger,
+  color: Colors.danger[500],
     fontWeight: Typography.fontWeight.medium,
     textAlign: 'center',
     marginBottom: Spacing.lg,
@@ -385,7 +401,7 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: Typography.fontSize['4xl'],
     fontWeight: Typography.fontWeight.bold,
-    color: Colors.primary,
+  color: Colors.primary[500],
     marginBottom: Spacing.xs,
   },
   metricLabel: {
@@ -468,7 +484,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray[50],
     borderRadius: BorderRadius.md,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.secondary,
+  borderLeftColor: Colors.secondary[500],
   },
   suggestionText: {
     fontSize: Typography.fontSize.base,

@@ -1,3 +1,11 @@
+/**
+ * Bulk delete categories endpoint (/api/categories/bulk-delete)
+ *
+ * Method: POST
+ * Body: { categoryIds: number[] }
+ * - Prevents deletion of categories that still have items.
+ * - Returns counts and details of categories blocked due to existing items.
+ */
 import { prisma } from "../../../lib/prisma";
 
 export default async function handler(req, res) {

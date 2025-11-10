@@ -1,3 +1,10 @@
+/**
+ * Category resource endpoint (/api/categories/[id])
+ *
+ * Supported Methods:
+ * PUT    - Update name (unique constraint enforced by Prisma).
+ * DELETE - Delete category only if it has zero associated items.
+ */
 import { prisma } from "../../../lib/prisma";
 import { validateCategory } from "../../../utils/validation";
 
@@ -73,6 +80,6 @@ export default async function handler(req, res) {
       }
     }
   } else {
-    res.status(405).json({ error: "Method not allowed" });
+    res.status(405).json({ error: "Method not allowed", allowed: ["PUT", "DELETE"] });
   }
 }

@@ -1,3 +1,13 @@
+/**
+ * Input – text field with optional label, helper/error text, icons and secure toggle.
+ *
+ * Features:
+ *  - Size variants (small|medium|large)
+ *  - Secure text visibility toggle for passwords
+ *  - Inline error state & helper messaging
+ *  - Optional left/right icon slots
+ *  - Multiline support
+ */
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors } from '../../constants/colors';
@@ -168,7 +178,7 @@ const styles = StyleSheet.create({
   },
   
   error: {
-    borderColor: Colors.danger,
+    borderColor: Colors.danger[500],
   },
   
   disabled: {
@@ -208,7 +218,7 @@ const styles = StyleSheet.create({
   },
   
   errorText: {
-    color: Colors.danger,
+    color: Colors.danger[500],
   },
 });
 

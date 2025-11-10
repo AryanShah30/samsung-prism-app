@@ -1,4 +1,16 @@
-import { 
+/**
+ * Category icon + color heuristics.
+ *
+ * These helpers map free-form category names to a representative icon and color.
+ * The logic intentionally uses substring checks (rather than exact equality) to
+ * tolerate user-created variations (e.g. "Fresh Fruits", "Citrus fruit box").
+ *
+ * Edge cases:
+ *  - Overlapping terms ("fish" vs "seafood"): seafood path wins due to explicit branch.
+ *  - Unrecognized categories fall back to a generic package icon and a neutral color.
+ *  - Performance: O(n) string includes checks; acceptable given very small word set.
+ */
+import {
   Apple,
   Carrot,
   Milk,
@@ -22,6 +34,11 @@ import {
 } from 'lucide-react-native';
 import { Colors } from '../constants/colors';
 
+/**
+ * Infer an icon component for a given category name.
+ * @param {string} categoryName
+ * @returns {React.ComponentType} Lucide icon component
+ */
 export const getCategoryIcon = (categoryName) => {
   const name = categoryName.toLowerCase();
   
@@ -77,6 +94,11 @@ export const getCategoryIcon = (categoryName) => {
   return Package;
 };
 
+/**
+ * Infer a theme color for a given category name.
+ * @param {string} categoryName
+ * @returns {string} hex color (design token)
+ */
 export const getCategoryColor = (categoryName) => {
   const name = categoryName.toLowerCase();
   

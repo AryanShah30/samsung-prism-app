@@ -1,3 +1,18 @@
+/**
+ * AIChatScreen module – stack containing Chat and Suggestions views.
+ *
+ * ChatScreen:
+ *  - Maintains conversational history with optimistic user message append.
+ *  - Invokes ApiService.sendChatMessage; gracefully degrades on error.
+ *  - Keyboard handling for improved mobile UX (Done button when visible).
+ *
+ * SuggestionsScreen (inner):
+ *  - Fetches heuristic + AI suggestions; allows tapping to seed an initial chat prompt.
+ *
+ * Notes:
+ *  - A separate top-level SuggestionsScreen exists for dashboard navigation context.
+ *  - Future enhancement: streaming responses / typing indicator animation refinement.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -137,12 +152,12 @@ const ChatScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <View style={styles.aiIconContainer}>
-            <Bot size={20} color={Colors.primary} />
+            <Bot size={20} color={Colors.primary[500]} />
           </View>
           <Text style={styles.headerTitle}>Chef AI</Text>
         </View>
         <TouchableOpacity onPress={startNewChat} style={styles.newChatButton}>
-          <Plus size={20} color={Colors.primary} />
+          <Plus size={20} color={Colors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -156,7 +171,7 @@ const ChatScreen = ({ navigation, route }) => {
         {messages.length === 0 && (
           <View style={styles.welcomeContainer}>
             <View style={styles.welcomeIcon}>
-              <Bot size={48} color={Colors.primary} />
+              <Bot size={48} color={Colors.primary[500]} />
             </View>
             <Text style={styles.welcomeTitle}>Welcome to Chef AI!</Text>
             <Text style={styles.welcomeSubtitle}>
@@ -188,7 +203,7 @@ const ChatScreen = ({ navigation, route }) => {
             <View style={[styles.messageBubble, styles.aiMessage]}>
               <View style={styles.messageContent}>
                 <View style={styles.messageIcon}>
-                  <Bot size={16} color={Colors.primary} />
+                  <Bot size={16} color={Colors.primary[500]} />
                 </View>
                 <View style={styles.typingIndicator}>
                   <Text style={[styles.messageText, styles.aiMessageText]}>Thinking</Text>
@@ -230,7 +245,7 @@ const ChatScreen = ({ navigation, route }) => {
               onPress={sendMessage}
               disabled={!inputText.trim()}
             >
-              <Send size={20} color={inputText.trim() ? Colors.primary : Colors.gray[400]} />
+              <Send size={20} color={inputText.trim() ? Colors.primary[500] : Colors.gray[400]} />
             </TouchableOpacity>
           </View>
         </View>
@@ -297,7 +312,7 @@ const SuggestionsScreen = ({ navigation }) => {
         </TouchableOpacity>
         <View style={styles.spacer} />
         <TouchableOpacity>
-          <Plus size={24} color={Colors.primary} />
+          <Plus size={24} color={Colors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -495,7 +510,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.primary,
+  backgroundColor: Colors.primary[500],
   },
   typingDot1: {
     opacity: 0.4,

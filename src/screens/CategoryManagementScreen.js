@@ -1,3 +1,15 @@
+/**
+ * CategoryManagementScreen – CRUD + bulk deletion for categories.
+ *
+ * Features:
+ *  - Inline editing per category card.
+ *  - Selection mode enabling multi-select & server-side bulk delete.
+ *  - Modal-based create flow with validation.
+ *
+ * Safeguards:
+ *  - Bulk delete and single delete rely on backend guard that prevents deletion when items exist.
+ *  - User confirmation dialogs for destructive actions.
+ */
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -193,23 +205,23 @@ const CategoryManagementScreen = ({ navigation }) => {
           {isSelectionMode && (
             <>
               <TouchableOpacity onPress={selectAll} style={styles.headerButton}>
-                <Ionicons name="checkmark-done" size={20} color={Colors.primary} />
+                 <Ionicons name="checkmark-done" size={20} color={Colors.primary[500]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={deselectAll} style={styles.headerButton}>
-                <Ionicons name="close" size={20} color={Colors.danger} />
+                 <Ionicons name="close" size={20} color={Colors.danger[500]} />
               </TouchableOpacity>
               {selectedCategories.length > 0 && (
                 <TouchableOpacity onPress={handleBulkDelete} style={styles.headerButton}>
-                  <Ionicons name="trash" size={20} color={Colors.danger} />
+                  <Ionicons name="trash" size={20} color={Colors.danger[500]} />
                 </TouchableOpacity>
               )}
             </>
           )}
           <TouchableOpacity onPress={toggleSelectionMode} style={styles.headerButton}>
-            <Ionicons name={isSelectionMode ? "close" : "checkbox"} size={20} color={Colors.primary} />
+             <Ionicons name={isSelectionMode ? "close" : "checkbox"} size={20} color={Colors.primary[500]} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowAddModal(true)}>
-            <Ionicons name="add" size={24} color={Colors.primary} />
+             <Ionicons name="add" size={24} color={Colors.primary[500]} />
           </TouchableOpacity>
         </View>
       </View>
@@ -235,7 +247,7 @@ const CategoryManagementScreen = ({ navigation }) => {
                       {isSelected && <Ionicons name="checkmark" size={16} color="white" />}
                     </View>
                     <View style={[styles.categoryIconContainer, { backgroundColor: categoryColor }]}>
-                      <CategoryIcon size={24} color={Colors.primary} />
+                       <CategoryIcon size={24} color={Colors.primary[500]} />
                     </View>
                     <Text style={styles.categoryName}>{category.name}</Text>
                   </View>
@@ -251,17 +263,17 @@ const CategoryManagementScreen = ({ navigation }) => {
                   />
                   <View style={styles.editActions}>
                     <TouchableOpacity onPress={cancelEdit} style={styles.cancelButton}>
-                      <Ionicons name="close" size={20} color={Colors.danger} />
+                       <Ionicons name="close" size={20} color={Colors.danger[500]} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleEditCategory} style={styles.saveButton}>
-                      <Ionicons name="checkmark" size={20} color={Colors.success} />
+                       <Ionicons name="checkmark" size={20} color={Colors.success[500]} />
                     </TouchableOpacity>
                   </View>
                 </View>
               ) : (
                 <View style={styles.categoryContent}>
-                  <View style={[styles.categoryIconContainer, { backgroundColor: categoryColor }]}>
-                    <CategoryIcon size={24} color={Colors.primary} />
+                   <View style={[styles.categoryIconContainer, { backgroundColor: categoryColor }]}>
+                     <CategoryIcon size={24} color={Colors.primary[500]} />
                   </View>
                   <Text style={styles.categoryName}>{category.name}</Text>
                   <View style={styles.categoryActions}>
@@ -269,13 +281,13 @@ const CategoryManagementScreen = ({ navigation }) => {
                       onPress={() => startEdit(category)}
                       style={styles.actionButton}
                     >
-                      <Ionicons name="create-outline" size={20} color={Colors.primary} />
+                      <Ionicons name="create-outline" size={20} color={Colors.primary[500]} />
                     </TouchableOpacity>
                     <TouchableOpacity 
                       onPress={() => handleDeleteCategory(category)}
                       style={styles.actionButton}
                     >
-                      <Ionicons name="trash-outline" size={20} color={Colors.danger} />
+                      <Ionicons name="trash-outline" size={20} color={Colors.danger[500]} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -401,12 +413,12 @@ const styles = StyleSheet.create({
   cancelButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: Colors.danger + '20',
+  backgroundColor: Colors.danger[50],
   },
   saveButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: Colors.success + '20',
+  backgroundColor: Colors.success[50],
   },
   modalOverlay: {
     flex: 1,
@@ -453,7 +465,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.accent,
   },
   selectedCategoryCard: {
-    borderColor: Colors.primary,
+  borderColor: Colors.primary[500],
     borderWidth: 2,
   },
   selectionCard: {
@@ -474,8 +486,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkedBox: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+  backgroundColor: Colors.primary[500],
+  borderColor: Colors.primary[500],
   },
 });
 

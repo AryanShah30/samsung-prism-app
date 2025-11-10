@@ -1,3 +1,10 @@
+/**
+ * AI-like suggestions endpoint (/api/dashboard/suggestions)
+ *
+ * Method: GET
+ * - Builds suggestion cards based on expiry windows and category heuristics.
+ * - Falls back to default tips when inventory is empty.
+ */
 import { prisma } from "../../../lib/prisma";
 import { getDaysUntilExpiry } from "../../../utils/status";
 import { EXPIRY_THRESHOLDS } from "../../../utils/config";
