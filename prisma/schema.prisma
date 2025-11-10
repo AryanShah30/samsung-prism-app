@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Category {
-  id    Int       @id @default(autoincrement())
-  name  String    @unique
+  id    Int        @id @default(autoincrement())
+  name  String     @unique
   items FoodItem[]
 }
 
@@ -18,15 +18,13 @@ model FoodItem {
   name            String
   quantity        Float
   unit            String
-
   dateAdded       DateTime @default(now())
   expiryDate      DateTime
   daysUntilExpiry Int
   status          String
   notes           String?
-
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  category        Category @relation(fields: [categoryId], references: [id])
 
   @@index([daysUntilExpiry])
   @@index([status])

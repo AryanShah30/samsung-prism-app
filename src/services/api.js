@@ -1,4 +1,8 @@
-const API_BASE_URL = "http://172.17.74.65:3000/api";
+// Prefer an environment override so devices/emulators can point to the correct host.
+// Update `API_BASE_URL` in your dev environment when necessary. Fallbacks provided
+// below are for local development only.
+const DEFAULT_DEV_HOST = "http://172.17.73.127:3000"; // your machine IP (updated)
+const API_BASE_URL = process.env.API_BASE_URL || `${DEFAULT_DEV_HOST}/api`;
 
 class ApiService {
   async request(endpoint, options = {}) {
