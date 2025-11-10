@@ -31,6 +31,30 @@ class ApiService {
     }
   }
 
+  async detectFood(imageUri) {
+    const url = `${API_BASE_URL}/detect`;
+
+    const form = new FormData();
+    // Expo/React Native FormData file shape
+    form.append('image', {
+      uri: imageUri,
+      name: 'photo.jpg',
+      type: 'image/jpeg',
+    });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      // Let fetch set the correct multipart boundary header
+      body: form,
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Detection failed');
+    }
+    return data; // { label, confidence, items }
+  }
+
   async getItems() {
     return this.request("/items");
   }

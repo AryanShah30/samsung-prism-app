@@ -16,6 +16,7 @@ export default async function handler(req, res) {
     }
   } else if (req.method === "POST") {
     try {
+      // Accept client payload using `quantity` + `unit` (unit defaults to 'g') and map to DB fields
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
 
       const validation = validateFoodItem({
@@ -37,8 +38,9 @@ export default async function handler(req, res) {
       const newFood = await prisma.foodItem.create({
         data: {
           name: name.trim(),
-          quantity,
-          unit: unit.trim(),
+          // store quantity into existing `volume` column and default unit to 'g'
+          volume: quantity,
+          volumeUnit: unit || 'g',
           expiryDate: new Date(expiryDate),
           notes: notes ? notes.trim() : notes,
           categoryId,

@@ -62,8 +62,8 @@ export default async function handler(req, res) {
       fresh: inventoryAnalysis.fresh,
       allItems: foodItems.map((item) => ({
         name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
+        volume: item.volume,
+        volumeUnit: item.volumeUnit || 'g',
         category: item.category.name,
         expiryDate: item.expiryDate,
         daysUntilExpiry: item.daysUntilExpiry,
@@ -195,9 +195,29 @@ Respond naturally and be helpful. If there are urgent items, mention them briefl
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Gemini API error: ${response.status} ${response.statusText}`
-      );
+      // try to surface Gemini error details
+      let text = null;
+      try {
+        text = await response.text();
+      } catch (e) {
+        text = null;
+      }
+
+      console.error('Gemini API returned non-OK:', response.status, response.statusText, text);
+
+      if (response.status === 429) {
+        return res.status(503).json({
+          error: "Gemini quota exceeded",
+          details: text || `${response.status} ${response.statusText}`,
+        });
+      }
+
+      return res.status(502).json({
+        error: "Gemini API error",
+        status: response.status,
+        statusText: response.statusText,
+        details: text,
+      });
     }
 
     const data = await response.json();

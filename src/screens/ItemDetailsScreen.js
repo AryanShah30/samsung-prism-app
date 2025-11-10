@@ -27,8 +27,7 @@ const ItemDetailsScreen = ({ route, navigation }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [formData, setFormData] = useState({
     name: item.name || '',
-    quantity: item.quantity ? item.quantity.toString() : '1',
-    unit: item.unit || 'pc',
+    quantity: item.volume ? item.volume.toString() : '250',
     expiryDate: item.expiryDate ? item.expiryDate.split('T')[0] : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     notes: item.notes || '',
     categoryId: item.category?.id || null,
@@ -57,11 +56,7 @@ const ItemDetailsScreen = ({ route, navigation }) => {
       return;
     }
     if (!formData.quantity || isNaN(parseFloat(formData.quantity)) || parseFloat(formData.quantity) <= 0) {
-      Alert.alert('Validation Error', 'Please enter a valid quantity');
-      return;
-    }
-    if (!formData.unit.trim()) {
-      Alert.alert('Validation Error', 'Please enter a unit');
+      Alert.alert('Validation Error', 'Please enter a valid quantity in grams');
       return;
     }
     if (!formData.expiryDate) {
@@ -71,10 +66,14 @@ const ItemDetailsScreen = ({ route, navigation }) => {
 
     setLoading(true);
     try {
+      // send quantity (grams) to the server; server defaults unit to 'g' if omitted
       const itemData = {
-        ...formData,
+        name: formData.name,
         quantity: parseFloat(formData.quantity),
+        unit: 'g',
         expiryDate: new Date(formData.expiryDate).toISOString(),
+        notes: formData.notes,
+        categoryId: formData.categoryId,
       };
 
       let savedItem;
@@ -103,8 +102,7 @@ const ItemDetailsScreen = ({ route, navigation }) => {
     }
     setFormData({
       name: item.name,
-      quantity: item.quantity.toString(),
-      unit: item.unit,
+      quantity: item.volume ? item.volume.toString() : '250',
       expiryDate: item.expiryDate.split('T')[0],
       notes: item.notes || '',
       categoryId: item.category?.id || null,
@@ -214,23 +212,15 @@ const ItemDetailsScreen = ({ route, navigation }) => {
           <View style={styles.quantityRow}>
             <View style={styles.quantityContainer}>
               <Input
-                label="Quantity *"
+                label="Quantity (g) *"
                 value={formData.quantity}
                 onChangeText={(text) => setFormData({ ...formData, quantity: text })}
                 keyboardType="numeric"
-                placeholder="1"
+                placeholder="250"
                 style={styles.quantityInput}
               />
             </View>
-            <View style={styles.unitContainer}>
-              <Input
-                label="Unit *"
-                value={formData.unit}
-                onChangeText={(text) => setFormData({ ...formData, unit: text })}
-                placeholder="pc, kg, liter"
-                style={styles.unitInput}
-              />
-            </View>
+            {/* Unit selection removed - quantity is in grams by default */}
           </View>
           
           <Input
@@ -425,6 +415,30 @@ const styles = StyleSheet.create({
   },
   unitContainer: {
     flex: 1,
+  },
+  unitOptionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  unitOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.background.accent,
+    borderWidth: 1,
+    borderColor: Colors.gray[300],
+  },
+  unitOptionSelected: {
+    backgroundColor: Colors.primary[50],
+    borderColor: Colors.primary,
+  },
+  unitOptionText: {
+    color: Colors.text.primary,
+  },
+  unitOptionTextSelected: {
+    color: Colors.primary,
+    fontWeight: '600',
   },
   quantityInput: {
     marginBottom: 0,

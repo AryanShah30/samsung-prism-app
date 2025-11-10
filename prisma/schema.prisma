@@ -16,8 +16,8 @@ model Category {
 model FoodItem {
   id              Int      @id @default(autoincrement())
   name            String
-  quantity        Float
-  unit            String
+  volume          Float
+  volumeUnit      String   @default("g")
   dateAdded       DateTime @default(now())
   expiryDate      DateTime
   daysUntilExpiry Int

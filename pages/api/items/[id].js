@@ -11,6 +11,7 @@ export default async function handler(req, res) {
 
   if (req.method === "PUT") {
     try {
+      // Accept `quantity` + `unit` from client and map to DB fields (volume/volumeUnit)
       const { name, quantity, unit, expiryDate, notes, categoryId } = req.body;
 
       const validation = validateFoodItem({
@@ -30,8 +31,9 @@ export default async function handler(req, res) {
 
       let updateData = {
         ...(name && { name: name.trim() }),
-        ...(quantity && { quantity }),
-        ...(unit && { unit: unit.trim() }),
+        // map quantity/unit -> volume/volumeUnit
+        ...(quantity !== undefined && { volume: quantity }),
+        ...(unit && { volumeUnit: unit }),
         ...(expiryDate && { expiryDate: new Date(expiryDate) }),
         ...(notes !== undefined && { notes: notes ? notes.trim() : notes }),
         ...(categoryId && { categoryId }),

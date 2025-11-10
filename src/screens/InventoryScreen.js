@@ -9,7 +9,8 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
-import { Search, Filter, Plus, ArrowLeft, Settings, Grid3X3, List } from 'lucide-react-native';
+import { Search, Filter, Plus, ArrowLeft, Settings, Grid3X3, List, Camera } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { createStackNavigator } from '@react-navigation/stack';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
@@ -30,6 +31,106 @@ const CategoryListScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); 
+  const [detecting, setDetecting] = useState(false);
+  const [detected, setDetected] = useState(null); // {label, confidence}
+
+  const pickImageFromLibrary = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'We need access to your photo library to pick images.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: false,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      await runDetection(result.assets[0].uri);
+    }
+  };
+
+  const takePhotoWithCamera = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'We need camera access to take photos.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 0.8,
+      allowsEditing: false,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      await runDetection(result.assets[0].uri);
+    }
+  };
+
+  const runDetection = async (uri) => {
+    try {
+      setDetecting(true);
+      setDetected(null);
+      const res = await ApiService.detectFood(uri);
+      setDetected(res);
+
+      // If we got a reasonable detection, offer to open Add Item with pre-filled fields
+      try {
+        const confidence = typeof res.confidence === 'number' ? res.confidence : null;
+        const label = res.label || '';
+        const estimatedDays = Number(res.estimated_expiry_days) || null;
+        const estimatedVolume = Number(res.estimated_volume_ml) || null;
+        const detectedCategoryName = res.category || null;
+
+        const shouldPrompt = !!label || !!estimatedVolume || !!estimatedDays;
+
+        if (shouldPrompt) {
+          const percent = confidence ? Math.round(confidence * 100) : null;
+          const messageParts = [];
+          if (label) messageParts.push(`Name: ${label}`);
+          if (percent !== null) messageParts.push(`Confidence: ${percent}%`);
+          if (estimatedVolume) messageParts.push(`Quantity: ${Math.round(estimatedVolume)} g`);
+          if (estimatedDays) messageParts.push(`Expires in ~${estimatedDays} day${estimatedDays > 1 ? 's' : ''}`);
+
+          Alert.alert(
+            'Add detected item?',
+            messageParts.join('\n'),
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Add', onPress: () => {
+                // find matching category (case-insensitive)
+                let matchedCategory = null;
+                if (detectedCategoryName && Array.isArray(categories)) {
+                  matchedCategory = categories.find(c => c.name.toLowerCase() === detectedCategoryName.toLowerCase());
+                }
+
+                const now = Date.now();
+                const expiryDate = estimatedDays ? new Date(now + estimatedDays * 24 * 60 * 60 * 1000).toISOString() : new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
+                const prefill = {
+                  id: 0,
+                  name: label || '',
+                  volume: estimatedVolume || 250,
+                  dateAdded: new Date().toISOString(),
+                  expiryDate,
+                  notes: '',
+                  category: matchedCategory ? { id: matchedCategory.id, name: matchedCategory.name } : undefined,
+                  daysUntilExpiry: estimatedDays || 7,
+                };
+
+                navigation.navigate('ItemDetails', { item: prefill });
+              } }
+            ],
+            { cancelable: true }
+          );
+        }
+      } catch (e) {
+        console.warn('Prefill/navigation error', e);
+      }
+    } catch (e) {
+      console.error('Detection error', e);
+      Alert.alert('Detection failed', e.message || 'Unable to detect item');
+    } finally {
+      setDetecting(false);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -109,6 +210,18 @@ const CategoryListScreen = ({ navigation }) => {
             >
               <List size={20} color={viewMode === 'list' ? Colors.primary : Colors.gray[500]} />
             </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.cameraButton}
+              onPress={() => {
+                Alert.alert('Add Image', 'Choose source', [
+                  { text: 'Camera', onPress: takePhotoWithCamera },
+                  { text: 'Gallery', onPress: pickImageFromLibrary },
+                  { text: 'Cancel', style: 'cancel' },
+                ]);
+              }}
+            >
+              <Camera size={20} color={Colors.primary} />
+            </TouchableOpacity>
           </View>
         </View>
         
@@ -173,6 +286,21 @@ const CategoryListScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Detection Result */}
+      {detected && (
+        <View style={styles.detectContainerWrapper}>
+          <Card style={styles.detectCard}>
+            <Text style={styles.detectTitle}>Detected item</Text>
+            <View style={styles.detectRow}>
+              <Text style={styles.detectLabel}>{detected.label || 'No item'}</Text>
+              {typeof detected.confidence === 'number' && (
+                <Text style={styles.detectConfidence}>{Math.round(detected.confidence * 100)}%</Text>
+              )}
+            </View>
+          </Card>
+        </View>
+      )}
 
       {/* Categories */}
       <View style={viewMode === 'grid' ? styles.categoriesGrid : styles.categoriesList}>
@@ -274,8 +402,7 @@ const ItemListScreen = ({ route, navigation }) => {
           item: { 
             id: 0, 
             name: '', 
-            quantity: 1, 
-            unit: 'pc', 
+            volume: 250, 
             dateAdded: new Date().toISOString(), 
             expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), 
             notes: '', 
@@ -305,7 +432,7 @@ const ItemListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.quantityContainer}>
                 <Text style={styles.quantityText}>
-                  {item.quantity} {item.unit}
+                  {item.volume ? `${Math.round(item.volume)} g` : ''}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -369,6 +496,11 @@ const styles = StyleSheet.create({
   viewModeButtonActive: {
     backgroundColor: Colors.primary[50],
   },
+  cameraButton: {
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.primary[50],
+  },
   
   searchContainer: {
     flexDirection: 'row',
@@ -408,6 +540,34 @@ const styles = StyleSheet.create({
   },
   filterButtonActive: {
     backgroundColor: Colors.warning[50],
+  },
+
+  detectContainerWrapper: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  detectCard: {
+    backgroundColor: Colors.gray[50],
+  },
+  detectTitle: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.xs,
+    fontWeight: Typography.fontWeight.medium,
+  },
+  detectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  detectLabel: {
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    color: Colors.text.primary,
+  },
+  detectConfidence: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.text.secondary,
   },
   
   actionButtons: {

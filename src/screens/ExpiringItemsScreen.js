@@ -91,7 +91,7 @@ const ExpiringItemsScreen = ({ navigation }) => {
                     <Text style={styles.itemName}>{item.name}</Text>
                     <Text style={styles.categoryName}>{item.category.name}</Text>
                     <Text style={styles.quantityText}>
-                      {item.quantity} {item.unit}
+                      {item.volume ? `${Math.round(item.volume)} g` : ''}
                     </Text>
                     <Text style={styles.expiryText}>
                       Expires: {formatDate(item.expiryDate)}

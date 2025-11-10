@@ -15,19 +15,12 @@ export const VALIDATION_RULES = {
     MAX_LENGTH: 20,
     PATTERN: /^[a-zA-Z\s\-]+$/,
   },
-
-  UNIT: {
-    MIN_LENGTH: 1,
-    MAX_LENGTH: 10,
-    PATTERN: /^[a-zA-Z\s\-]+$/,
+  QUANTITY: {
+    MIN: 0.01,
   },
 
   NOTES: {
     MAX_LENGTH: 100,
     PATTERN: /^[a-zA-Z0-9\s\-\(\)&.,!?]+$/,
-  },
-
-  QUANTITY: {
-    MIN: 0.01,
   },
 };

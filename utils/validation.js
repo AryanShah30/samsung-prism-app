@@ -30,35 +30,14 @@ export function validateFoodItem(data) {
     }
   }
 
-  if (
-    !data.quantity ||
-    typeof data.quantity !== "number" ||
-    data.quantity <= 0
-  ) {
-    errors.push("Quantity must be a positive number");
+  // quantity (in grams by default)
+  if (!('quantity' in data) || typeof data.quantity !== 'number' || data.quantity <= 0) {
+    errors.push('Quantity must be a positive number');
   }
 
-  if (
-    !data.unit ||
-    typeof data.unit !== "string" ||
-    data.unit.trim().length === 0
-  ) {
-    errors.push("Unit is required");
-  } else {
-    const trimmedUnit = data.unit.trim();
-    if (!VALIDATION_RULES.UNIT.PATTERN.test(trimmedUnit)) {
-      errors.push("Unit must contain only letters, spaces, and hyphens");
-    }
-    if (trimmedUnit.length < VALIDATION_RULES.UNIT.MIN_LENGTH) {
-      errors.push(
-        `Unit must be at least ${VALIDATION_RULES.UNIT.MIN_LENGTH} character long`
-      );
-    }
-    if (trimmedUnit.length > VALIDATION_RULES.UNIT.MAX_LENGTH) {
-      errors.push(
-        `Unit must be less than ${VALIDATION_RULES.UNIT.MAX_LENGTH} characters`
-      );
-    }
+  // unit is optional but if present must be a string (we default to 'g' on the server)
+  if (data.unit !== undefined && typeof data.unit !== 'string') {
+    errors.push('Unit must be a string');
   }
 
   if (!data.expiryDate || isNaN(Date.parse(data.expiryDate))) {
