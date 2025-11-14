@@ -14,7 +14,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
+import { Home, List, MessageSquare } from 'lucide-react-native';
 import DashboardScreen from './src/screens/DashboardScreen';
 import InventoryScreen from './src/screens/InventoryScreen';
 import AIChatScreen from './src/screens/AIChatScreen';
@@ -43,17 +43,14 @@ export default function App() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
             if (route.name === 'Dashboard') {
-              iconName = focused ? 'home' : 'home-outline';
+              return <Home size={size} color={color} />;
             } else if (route.name === 'Inventory') {
-              iconName = focused ? 'list' : 'list-outline';
+              return <List size={size} color={color} />;
             } else if (route.name === 'AI Chat') {
-              iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+              return <MessageSquare size={size} color={color} />;
             }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return null;
           },
           
           tabBarActiveTintColor: '#6366F1',
